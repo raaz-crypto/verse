@@ -9,6 +9,7 @@ record _×_ {ℓ : Level} (A B : Set ℓ) : Set ℓ where
     proj₀ : A
     proj₁ : B
 
+open _×_ public
 data ⊤ {ℓ : Level} : Set ℓ where
      tt : ⊤
 
