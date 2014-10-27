@@ -8,16 +8,18 @@ open import Relation.Nullary.Negation
 import Data.Maybe as Maybe
 
 open import Data.Maybe public
-                       using    ()
+                       using    (functor)
                        renaming ( Maybe to Error
                                 ; just  to error:
                                 ; nothing to ✓
                                 )
 
+open import verse.product
 
 data Expect (K : Set) : Set where
   expected   : K → Expect K
   unexpected : K → Expect K
+
 
 when_raise_ : {C E : Set} → Dec C → E → Error E
 when c raise e with c
@@ -26,3 +28,8 @@ when c raise e with c
 
 unless_raise_ : {C E : Set} → Dec C → E → Error E
 unless c raise e = when ¬? c raise e
+
+
+_∧_ : {A B : Set} → Error A → Error B → Error (Error A × Error B)
+✓ ∧ ✓  = ✓
+a ∧ b  = error: (a , b)
