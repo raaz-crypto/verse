@@ -75,6 +75,21 @@ data Type    : Size → Error TypeError → Set where
   _⋆         : {k : Kind} → Type (bounded k) ✓ → Type ∞ ✓
 
 
+-- It is generally true that if a machine supports a word of size 2^k
+-- then it supports any array whose underlying scalar is of the same
+-- size. Similarly if it supports bounded type t, it supports
+-- sequences of those sizes. We give a function which given the word
+-- size checks if the particular type is supported.
+
+supports? : {b : Size}{err : Error TypeError}
+          → ℕ
+          → Type b err → Error TypeError
+
+supports? m (word n _)       = when suc m ≤?ℕ n raise wordsize m < n ∎
+supports? m (array  _ of ty) = supports? m ty
+supports? m (ty ⋆)           = supports? m ty
+
+
 ScalarType : Set
 ScalarType = Type (bounded Scalar) ✓
 
