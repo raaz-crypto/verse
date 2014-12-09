@@ -30,10 +30,12 @@ _≤?_ {suc n} (a , as) (b , bs)
 ...  |    _       | no neg   = no (neg ∘ proj₁)
 
 data IndexError :  Set where
-  index_≮_∎ : {n : ℕ} → Index n → Index n → IndexError
+  index_≮_∎     : {n : ℕ} → Index n → Index n → IndexError
 
-data BoundError : Set where
-  bound_≱_∎ : {n : ℕ} → Index n → Index n → BoundError
+
+data TypeError : Set where
+  bound_≱_∎    : {n   : ℕ} → Index n → Index n → TypeError
+  wordsize_<_∎ : (n m : ℕ) → TypeError
 
 
 index? : {n : ℕ} → Index n → Index n  → Error IndexError
@@ -42,7 +44,7 @@ index? as bs = unless incr as ≤? bs raise (index as ≮ bs ∎)
         incr {0} a            = suc a
         incr {suc n} (a , aˢ) = a , incr aˢ
 
-bound? : {n : ℕ} → Index n → Error BoundError
+bound? : {n : ℕ} → Index n → Error TypeError
 bound? bˢ = unless 2ˢ ≤? bˢ raise bound bˢ ≱ 2ˢ ∎
   where 2ˢ : {n : ℕ} → Index n
         2ˢ {0}     = 2
@@ -62,7 +64,7 @@ data Size  : Set   where
   bounded  : Kind → Size
 
 
-data Type    : Size → Error BoundError → Set where
+data Type    : Size → Error TypeError → Set where
   word       : (n : ℕ)   -- 2^n bytes.
              → Endian
              → Type (bounded Scalar) ✓
