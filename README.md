@@ -6,3 +6,10 @@ designed specifically to write portable assembly language code for
 implementing cryptographic primitives for the Raaz cryptographic
 library. Therefore it provides a rather limited set of features and
 might not be suitable for other purposes.
+
+
+Requirements
+------------
+
+Agda 2.4.2.2
+Agda-stdlib 0.9
