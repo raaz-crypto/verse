@@ -14,7 +14,7 @@ open import Data.Maybe public
                                 ; nothing to ✓
                                 )
 
-open import verse.product
+open import Data.Product
 
 data Expect (K : Set) : Set where
   expected   : K → Expect K
