@@ -1,4 +1,4 @@
-module verse.language.machine where
+module verse.language.arch where
 
 open import verse.language.types
 open import verse.error
