@@ -16,8 +16,8 @@ open import verse.product
 -- infinitary.
 
 data Dim : Set where
-  ∞     : Dim
-  finite   : ℕ → Dim
+  ∞      : Dim
+  finite : ℕ → Dim
 
 -- Type that catches kind errors.
 data KindError : Set
