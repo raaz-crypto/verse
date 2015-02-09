@@ -53,3 +53,25 @@ record Machine (arch : Arch) : Set₁ where
     -- Check whether this instruction is supported and raise an error
     -- otherwise.
     instruction? : instruction → Error (MachineError arch)
+
+
+-- Local variable is either allocated on the stack or is a register.
+data Local (arch : Arch) : Set where
+     onStack    : {d : Dim}{k : Kind {d} ✓} → stackOffset → Type k → Local arch
+     inRegister : register    → Local arch
+
+data OpType : Set where
+     ReadOnly  : OpType
+     ReadWrite : OpType
+
+-- Operands associated with an architecture.
+data Operand (arch : Arch) (o : OpType) : Set where
+
+     -- It can be a function parameter.
+     param : {d : Dim} → {k : Kind {d} ✓} → stackOffset → Type k →  Operand arch o
+
+     -- Or a register
+     reg   : register → Operand arch o
+
+     -- Or a local variable. Local variable can be either on a stack or a register.
+     local : Local arch →  Operand arch o
