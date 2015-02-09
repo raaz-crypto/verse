@@ -1,6 +1,7 @@
 module verse.language.arch where
 
 open import verse.error
+open import verse.language.types
 
 -- An architecture is a generic class of machines. It determines the
 -- instructions and registers that machine of that architecture can
@@ -26,6 +27,9 @@ record Arch : Set₁ where
 
     -- Type that captures constants of the architecture.
     constant      : Set
+
+    -- Get the type of a register.
+    typeOf        : {d : Dim}{k : Kind {d} ✓} → register → Type k
 
 open Arch ⦃ ... ⦄
 
