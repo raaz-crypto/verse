@@ -16,7 +16,7 @@ record Arch : Set₁ where
     -- The instruction set.
     instruction   : Set
 
-    -- The registered supported by machines
+    -- The registers supported by machines
     register      : Set
 
     -- Type that captures stack offset in this architecture. Merely

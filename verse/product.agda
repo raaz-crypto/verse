@@ -1,7 +1,6 @@
 module verse.product where
 
-import Data.Product
-open        Data.Product public
+open import Data.Product public
 -- open        Data.Product public using    ( proj₁; proj₂ )
 open import Data.Unit           using    ( ⊤ )
 open import Data.Nat            hiding   ( _⊔_ )

@@ -7,12 +7,12 @@ open import Relation.Nullary
 open import Relation.Nullary.Negation
 import Data.Maybe as Maybe
 
-open import Data.Maybe public
-                       using    (functor)
-                       renaming ( Maybe to Error
-                                ; just  to error:
-                                ; nothing to ✓
-                                )
+open import Data.Maybe as Maybe public
+                                using    (functor)
+                                renaming ( Maybe to Error
+                                         ; just  to error:
+                                         ; nothing to ✓
+                                         )
 
 open import Data.Product
 
