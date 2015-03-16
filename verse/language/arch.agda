@@ -29,7 +29,7 @@ record Arch : Set₁ where
     constant      : Set
 
     -- Get the type of a register.
-    typeOf        : register → {d : Dim}{k : Kind {d} ✓} → Type k
+    -- typeOf        : register → {d : Dim}{k : Kind {d} ✓} → Type k
 
 open Arch ⦃ ... ⦄
 
