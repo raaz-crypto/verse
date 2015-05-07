@@ -78,3 +78,16 @@ cAddEq = record { _+≔_ = caddeq }
         caddeq (local (inRegister var₁)) (local (inRegister var₂)) = var₁ CInstruction.+≔ var₂ ∷ []
 
 
+-- Define C Machine
+
+CRegister? : CRegister → Error (MachineError c-arch)
+CRegister? _ = ✓
+
+
+CInstruction? : CInstruction → Error (MachineError c-arch)
+CInstruction? (_ CInstruction.+≔ _) = ✓
+CInstruction? other = error: Instruction other Unsupported
+
+
+c-mach : Machine c-arch
+c-mach = MakeMachine CRegister? CInstruction?

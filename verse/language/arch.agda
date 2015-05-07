@@ -75,3 +75,5 @@ data Operand (arch : Arch) (o : OpType) : Set where
 
      -- Or a local variable. Local variable can be either on a stack or a register.
      local : Local arch →  Operand arch o
+
+
