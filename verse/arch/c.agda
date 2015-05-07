@@ -5,10 +5,14 @@ open import verse.language.types
 open import verse.language.instructions
 open import Data.String
 open import Data.List
+open import Data.Nat
 open import verse.error
+
+-- Define C Architecture
 
 data CRegister : Set where
   〈_ofType_〉 : {d : Dim}{k : Kind {d} ✓} → String → Type k → CRegister
+
 
 data CInstruction : Set where
   _≔_+_ : CRegister → CRegister → CRegister → CInstruction
@@ -25,13 +29,30 @@ data CInstruction : Set where
   _/≔_  : CRegister → CRegister → CInstruction
   _%≔_  : CRegister → CRegister → CInstruction
 
+
 data CConstant : Set where
 
--- typeOfCRegister : CRegister → {d : Dim}{k : Kind {d} ✓} → Type k
--- typeOfCRegister 〈 _ ofType ty 〉 {d} {k} = {!!}
+
+typeOfCRegister : {d : Dim}{k : Kind {d} ✓} → CRegister → Type k
+typeOfCRegister {∞} {⟨∞⟩} 〈 x ofType word n x₁ 〉 = word n x₁ ⋆
+typeOfCRegister {∞} {⟨∞⟩} 〈 x ofType array k of ty 〉 = (array k of ty) ⋆
+typeOfCRegister {∞} {⟨∞⟩} 〈 x ofType word n x₁ ⋆ 〉 = word n x₁ ⋆
+typeOfCRegister {∞} {⟨∞⟩} 〈 x ofType (array k of ty) ⋆ 〉 = (array k of ty) ⋆
+typeOfCRegister {finite zero} {⟨ bs ⟩} 〈 x ofType word n x₁ 〉 = word n x₁
+typeOfCRegister {finite (suc x₂)} {k} 〈 x ofType word n x₁ 〉 = array k of word n x₁
+typeOfCRegister {finite zero} {⟨ bs ⟩} 〈 x ofType array k of word n₁ x₁ 〉 = word n₁ x₁
+typeOfCRegister {finite (suc x₂)} {k₁} 〈 x ofType array k of word n₁ x₁ 〉 = array k₁ of word n₁ x₁
+typeOfCRegister {finite zero} {⟨ bs ⟩} 〈 x ofType word n x₁ ⋆ 〉 = word n x₁
+typeOfCRegister {finite (suc x₂)} {k} 〈 x ofType word n x₁ ⋆ 〉 = array k of (word n x₁)
+typeOfCRegister {finite zero} {⟨ bs ⟩} 〈 x ofType (array k of word n₁ x₁) ⋆ 〉 = word n₁ x₁
+typeOfCRegister {finite (suc x₂)} {k₁} 〈 x ofType (array k of word n₁ x₁) ⋆ 〉 = array k₁ of word n₁ x₁
+
 
 c-arch : Arch
-c-arch = MakeArch CInstruction CRegister CRegister CConstant 
+c-arch = MakeArch CInstruction CRegister CRegister CConstant typeOfCRegister
+
+
+-- Define C Instructions
 
 open AddEq ⦃ ... ⦄
 open Arch
@@ -55,3 +76,5 @@ cAddEq = record { _+≔_ = caddeq }
         caddeq (local (onStack var₁ _)) (local (inRegister var₂)) = var₁ CInstruction.+≔ var₂ ∷ []
         caddeq (local (inRegister var₁)) (local (onStack var₂ _)) = var₁ CInstruction.+≔ var₂ ∷ []
         caddeq (local (inRegister var₁)) (local (inRegister var₂)) = var₁ CInstruction.+≔ var₂ ∷ []
+
+
