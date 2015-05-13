@@ -10,54 +10,45 @@ open import verse.error
 
 -- Define C Architecture
 
-data CRegister : Set where
-  〈_ofType_〉 : {d : Dim}{k : Kind {d} ✓} → String → Type k → CRegister
+{-
+private
+  module declarations {d : Dim}{k : Kind {d} ✓} where
+
+    data CRegister : Type k → Set where
+      〈_ofType_〉 : String → (ty : Type k) → CRegister ty
+
+    typeOfCRegister : {ty : Type k} → CRegister ty → Type k
+    typeOfCRegister 〈 _ ofType ty 〉 = ty
+
+    specTypeOfC : {ty : Type k}(r : CRegister ty) → typeOfCRegister {ty} r ≡ ty
+    specTypeOfC 〈 _ ofType ty 〉 = refl  
+
+open declarations  
+-}
+
+
+data CVariable : Set where
+  cvar_ : String → CVariable
 
 
 data CInstruction : Set where
-  _≔_+_ : CRegister → CRegister → CRegister → CInstruction
-  _≔_-_ : CRegister → CRegister → CRegister → CInstruction
-  _≔_*_ : CRegister → CRegister → CRegister → CInstruction
-  _≔_/_ : CRegister → CRegister → CRegister → CInstruction
-  _≔_%_ : CRegister → CRegister → CRegister → CInstruction
-  _++   : CRegister → CInstruction
-  _−−   : CRegister → CInstruction
-  _≔_   : CRegister → CRegister → CInstruction
-  _+≔_  : CRegister → CRegister → CInstruction
-  _-≔_  : CRegister → CRegister → CInstruction
-  _*≔_  : CRegister → CRegister → CInstruction
-  _/≔_  : CRegister → CRegister → CInstruction
-  _%≔_  : CRegister → CRegister → CInstruction
+  _≔_+_ : CVariable → CVariable →  CVariable → CInstruction
+  _+≔_  : CVariable → CVariable → CInstruction
 
 
 data CConstant : Set where
 
 
-typeOfCRegister : {d : Dim}{k : Kind {d} ✓} → CRegister → Type k
-typeOfCRegister {∞} {⟨∞⟩} 〈 x ofType word n x₁ 〉 = word n x₁ ⋆
-typeOfCRegister {∞} {⟨∞⟩} 〈 x ofType array k of ty 〉 = (array k of ty) ⋆
-typeOfCRegister {∞} {⟨∞⟩} 〈 x ofType word n x₁ ⋆ 〉 = word n x₁ ⋆
-typeOfCRegister {∞} {⟨∞⟩} 〈 x ofType (array k of ty) ⋆ 〉 = (array k of ty) ⋆
-typeOfCRegister {finite zero} {⟨ bs ⟩} 〈 x ofType word n x₁ 〉 = word n x₁
-typeOfCRegister {finite (suc x₂)} {k} 〈 x ofType word n x₁ 〉 = array k of word n x₁
-typeOfCRegister {finite zero} {⟨ bs ⟩} 〈 x ofType array k of word n₁ x₁ 〉 = word n₁ x₁
-typeOfCRegister {finite (suc x₂)} {k₁} 〈 x ofType array k of word n₁ x₁ 〉 = array k₁ of word n₁ x₁
-typeOfCRegister {finite zero} {⟨ bs ⟩} 〈 x ofType word n x₁ ⋆ 〉 = word n x₁
-typeOfCRegister {finite (suc x₂)} {k} 〈 x ofType word n x₁ ⋆ 〉 = array k of (word n x₁)
-typeOfCRegister {finite zero} {⟨ bs ⟩} 〈 x ofType (array k of word n₁ x₁) ⋆ 〉 = word n₁ x₁
-typeOfCRegister {finite (suc x₂)} {k₁} 〈 x ofType (array k of word n₁ x₁) ⋆ 〉 = array k₁ of word n₁ x₁
-
-
 c-arch : Arch
-c-arch = MakeArch CInstruction CRegister CRegister CConstant typeOfCRegister
+c-arch = MakeArch CInstruction CVariable CVariable CConstant
 
 
 -- Define C Instructions
 
-open AddEq ⦃ ... ⦄
-open Arch
+cAddEq : AddEq {arch = c-arch}(reg ty (cvar x₁))(reg ty (cvar x₂))
+cAddEq = record { _+≔_ = x₁ CInstruction.+≔ x₂ :: []}
 
-cAddEq : AddEq c-arch
+{-
 cAddEq = record { _+≔_ = caddeq }
   where caddeq : {op : OpType} → Operand c-arch ReadWrite → Operand c-arch op → List (instruction c-arch)
         caddeq (param var₁ _) (param var₂ _) = var₁ CInstruction.+≔ var₂ ∷ []
@@ -76,10 +67,10 @@ cAddEq = record { _+≔_ = caddeq }
         caddeq (local (onStack var₁ _)) (local (inRegister var₂)) = var₁ CInstruction.+≔ var₂ ∷ []
         caddeq (local (inRegister var₁)) (local (onStack var₂ _)) = var₁ CInstruction.+≔ var₂ ∷ []
         caddeq (local (inRegister var₁)) (local (inRegister var₂)) = var₁ CInstruction.+≔ var₂ ∷ []
-
+-}
 
 -- Define C Machine
-
+{-
 CRegister? : CRegister → Error (MachineError c-arch)
 CRegister? _ = ✓
 
@@ -91,3 +82,4 @@ CInstruction? other = error: Instruction other Unsupported
 
 c-mach : Machine c-arch
 c-mach = MakeMachine CRegister? CInstruction?
+-}
