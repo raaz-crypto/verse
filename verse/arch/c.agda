@@ -32,21 +32,74 @@ data CVariable : Set where
 
 
 data CInstruction : Set where
-  _≔_+_ : CVariable → CVariable →  CVariable → CInstruction
   _+≔_  : CVariable → CVariable → CInstruction
 
 
 data CConstant : Set where
 
+{-
+data CInstruction : Set where
+  cComment : List (String) → CInstruction
+  cinst    : RawCInstruction → String → CInstruction
+-}
 
 c-arch : Arch
-c-arch = MakeArch CInstruction CVariable CVariable CConstant
+c-arch = MakeArch CInstruction CVariable CVariable CConstant 
 
+-- ToCVar typeclass, those Type which can be converted to a CVariable
+
+record ToCvar {d : Dim}{k : Kind {d} ✓}(A : Access → Type k → Set) : Set where
+  field
+    toCvar : {acc : Access}{ty : Type k}(a : A acc ty) → CVariable
+
+
+private
+  module OperandToCvar {d : Dim}{k : Kind {d} ✓} where
+
+    paramToCvar : {acc : Access}{ty : Type k} → ToCvar (Parameter c-arch)
+    paramToCvar = record { toCvar = helper}
+      where helper : {acc : Access}{ty : Type k}(a : Parameter c-arch acc ty) → CVariable
+            helper (param _ x) = x
+
+    regToCvar : {acc : Access}{ty : Type k} → ToCvar (Register c-arch)
+    regToCvar = record { toCvar = helper}
+      where helper : {acc : Access}{ty : Type k}(a : Register c-arch acc ty) → CVariable
+            helper (reg _ x) = x
+
+    localToCvar : {acc : Access}{ty : Type k} → ToCvar (Local c-arch)
+    localToCvar = record { toCvar = helper}
+      where helper : {acc : Access}{ty : Type k}(a : Local c-arch acc ty) → CVariable
+            helper (localStack _ x) = x
+            helper (localReg _ x) = x
+
+open OperandToCvar
 
 -- Define C Instructions
 
-cAddEq : AddEq {arch = c-arch}(reg ty (cvar x₁))(reg ty (cvar x₂))
-cAddEq = record { _+≔_ = x₁ CInstruction.+≔ x₂ :: []}
+
+open Arch
+open ToCvar ⦃...⦄
+
+
+cAddEq : {d : Dim}{k : Kind {d} ✓}
+       → ∀ {A B : Access → Type k → Set} ⦃ A' : ToCvar A ⦄ ⦃ B' : ToCvar B ⦄
+       → AddEq {arch = c-arch} A B
+cAddEq = record { _+≔_ = helper}
+  where helper : {d : Dim}{k : Kind {d} ✓}{A B : Access → Type k → Set}
+               → ⦃ A' : ToCvar A ⦄ ⦃ B' : ToCvar B ⦄
+               → {acc : Access} {ty : Type k}
+               → A ReadWrite ty → B acc ty → List (instruction c-arch)
+        helper op₁ op₂ = [ (toCvar op₁) CInstruction.+≔ (toCvar op₂) ]
+
+
+
+{-
+toCVar : {acc : Access}{d : Dim}{k : Kind {d} ✓}{ty : Type k} → Operand c-arch acc ty → CVariable
+toCVar (param ty x) = x
+toCVar (reg ty x) = x
+toCVar (local ty (onStack x)) = x
+toCVar (local ty (inRegister x)) = x
+-}
 
 {-
 cAddEq = record { _+≔_ = caddeq }

@@ -5,9 +5,8 @@ open import Data.String
 open import Data.List
 open Arch
 
-data Statement (arch : Arch) : Set where
-  stat : List (instruction arch) → Statement arch
 
+{-
 data VarDecl (arch : Arch) : Set where
 
 data FunctionBody (arch : Arch) : Set where
@@ -18,4 +17,4 @@ data Closure (arch : Arch) : Set where
 
 data Function (arch : Arch) : Set where
   func : String → Closure arch → FunctionBody arch → Function arch
-
+-}

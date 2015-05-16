@@ -7,7 +7,17 @@ open import verse.error
 
 open Arch
 
-record AddEq {arch : Arch}{opty : OpType}{d : Dim}{k : Kind {d} ✓}{ty : Type k}(op₁ : Operand arch ReadWrite ty)(op₂ : Operand arch opty ty) : Set where
-  field
-    _+≔_ : List (instruction arch)
+private
+  module ArithmeticAssign {arch : Arch}{d : Dim}{k : Kind {d} ✓} where
 
+{-
+    record AddEq {e : Error (MachineError arch)} (ty : Type k) : Set where
+      field
+        _+≔_ : (op₁ : Operand arch ReadWrite ty)(op₂ : Operand arch acc₂ ty) → Statement arch e
+-}
+  
+    record AddEq (A B : Access → Type k → Set) : Set where
+      field
+        _+≔_ : {acc : Access}{ty : Type k} → A ReadWrite ty → B acc ty → List (instruction arch)
+
+open ArithmeticAssign public
