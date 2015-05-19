@@ -39,7 +39,7 @@ record Arch : Set₁ where
     --typeOf        : {d : Dim}{k : Kind {d} ✓}{ty : Type k} → register ty  → Type k
     --specTypeOf    : {d : Dim}{k : Kind {d} ✓}{ty : Type k}(r : register ty) → typeOf r ≡ ty
 
-open Arch ⦃ ... ⦄
+open Arch {{...}}
 
 -- When generating instructions for a particular machine of a given
 -- architecture there can be errors due to unsupported registers or
@@ -96,16 +96,18 @@ data Operand {d : Dim}{k : Kind {d} ✓}(arch : Arch)(acc : Access) : Type k →
 -}
 
 private
-  module Operand {d : Dim}{k : Kind {d} ✓} where
+  module Operand {d : Dim}{k : Kind {d} ✓}(arch : Arch)(acc : Access) where
 
-    data Parameter (arch : Arch)(acc : Access) : Type k → Set where
-      param : (ty : Type k) → stackOffset → Parameter arch acc ty
+    data Parameter : Type k → Set where
+      param : {ty : Type k} → stackOffset → Parameter ty
 
-    data Register (arch : Arch)(acc : Access) : Type k → Set where
+{-
+    data Register  : Type k → Set where
       reg : (ty : Type k) → register → Register arch acc ty
 
-    data Local (arch : Arch)(acc : Access) : Type k → Set where
+    data Local     : Type k → Set where
       localStack : (ty : Type k) → stackOffset → Local arch acc ty
       localReg   : (ty : Type k) → register    → Local arch acc ty
+-}
 
 open Operand public
