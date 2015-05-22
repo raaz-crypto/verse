@@ -2,7 +2,7 @@ module verse.language.arch where
 
 open import verse.error
 open import verse.language.types
-open import Relation.Binary.PropositionalEquality
+open import Relation.Binary.PropositionalEquality using (_≡_)
 open import Data.List
 open import Data.String
 
@@ -96,7 +96,7 @@ data Operand {d : Dim}{k : Kind {d} ✓}(arch : Arch)(acc : Access) : Type k →
 -}
 
 private
-  module Operand {d : Dim}{k : Kind {d} ✓}(arch : Arch)(acc : Access) where
+  module DataStore {d : Dim}{k : Kind {d} ✓}(arch : Arch)(acc : Access) where
 
     data Parameter : Type k → Set where
       param : {ty : Type k} → stackOffset → Parameter ty
@@ -110,4 +110,12 @@ private
       localReg   : (ty : Type k) → register    → Local arch acc ty
 -}
 
-open Operand public
+open DataStore public
+
+record Operand {arch : Arch}{d : Dim}{k : Kind {d} ✓}{ty : Type k}{acc : Access}(A : Set) : Set where
+  field
+    access? : A → Access
+    typeOf? : A → Type k
+
+open Operand
+
