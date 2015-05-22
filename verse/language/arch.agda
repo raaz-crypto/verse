@@ -2,9 +2,7 @@ module verse.language.arch where
 
 open import verse.error
 open import verse.language.types
-open import Relation.Binary.PropositionalEquality using (_≡_)
-open import Data.List
-open import Data.String
+
 
 -- An architecture is a generic class of machines. It determines the
 -- instructions and registers that machine of that architecture can
@@ -31,15 +29,8 @@ record Arch : Set₁ where
     -- Type that captures constants of the architecture.
     constant      : Set
 
-    --⦃-_-⦄        : List (String) → List (instruction)
 
-    --_♯_           : instruction → String → instruction
-
-    -- Get the type of a register.
-    --typeOf        : {d : Dim}{k : Kind {d} ✓}{ty : Type k} → register ty  → Type k
-    --specTypeOf    : {d : Dim}{k : Kind {d} ✓}{ty : Type k}(r : register ty) → typeOf r ≡ ty
-
-open Arch {{...}}
+open Arch ⦃...⦄
 
 -- When generating instructions for a particular machine of a given
 -- architecture there can be errors due to unsupported registers or
@@ -47,6 +38,7 @@ open Arch {{...}}
 data MachineError (arch : Arch) : Set where
   Register_Unsupported    : register    → MachineError arch
   Instruction_Unsupported : instruction → MachineError arch
+
 
 -- A machine is essentially a restriction on the architecture. It gives
 -- predicates to check whether a register or instruction is supported.
@@ -64,36 +56,11 @@ record Machine (arch : Arch) : Set₁ where
 
 
 -- Local variable is either allocated on the stack or is a register.
-{-
-data Local (arch : Arch) : Set where
-     onStack    : stackOffset → Local arch
-     inRegister : register    → Local arch
--}
 
 data Access :  Set where
   ReadWrite : Access
   ReadOnly  : Access
 
-
-{-
-data Statement (arch : Arch)(e : Error (MachineError arch)) : Set where
-  statement : List (instruction) → Statement arch e
--}
-
-
--- Operands associated with an architecture.
-{-
-data Operand {d : Dim}{k : Kind {d} ✓}(arch : Arch)(acc : Access) : Type k → Set where
-
-     -- It can be a function parameter.
-     param : (ty : Type k) → stackOffset → Operand arch acc ty
-
-     -- Or a register
-     reg   : (ty : Type k) → register → Operand arch acc ty
-
-     -- Or a local variable. Local variable can be either on a stack or a register.
-     local : (ty : Type k) → Local arch →  Operand arch acc ty
--}
 
 private
   module DataStore {d : Dim}{k : Kind {d} ✓}(arch : Arch)(acc : Access) where
@@ -101,21 +68,46 @@ private
     data Parameter : Type k → Set where
       param : {ty : Type k} → stackOffset → Parameter ty
 
-{-
-    data Register  : Type k → Set where
-      reg : (ty : Type k) → register → Register arch acc ty
 
-    data Local     : Type k → Set where
-      localStack : (ty : Type k) → stackOffset → Local arch acc ty
-      localReg   : (ty : Type k) → register    → Local arch acc ty
--}
+    data Register : Type k → Set where
+      reg : {ty : Type k} → register → Register ty
+
+    data Local : Type k → Set where
+      localStack : {ty : Type k} → stackOffset → Local ty
+      localReg   : {ty : Type k} → register    → Local ty
 
 open DataStore public
 
-record Operand {arch : Arch}{d : Dim}{k : Kind {d} ✓}{ty : Type k}{acc : Access}(A : Set) : Set where
+
+-- Operand Typeclass
+
+record Operand {d : Dim}{k : Kind {d} ✓}(A : Set) : Set where
   field
-    access? : A → Access
-    typeOf? : A → Type k
+    access? : Access
+    typeOf? : Type k
 
 open Operand
 
+
+-- Operand instances
+
+private
+  module OperandInstances {arch : Arch}{acc : Access}{d : Dim}{k : Kind {d} ✓}{ty : Type k} where
+
+    instance
+      paramIsOperand : Operand (Parameter arch acc ty)
+      paramIsOperand = record { access? = acc
+                              ; typeOf? = ty
+                              }
+
+      regIsOperand : Operand (Register arch acc ty)
+      regIsOperand = record { access? = acc
+                            ; typeOf? = ty
+                            }
+
+      localIsOperand : Operand (Local arch acc ty)
+      localIsOperand = record { access? = acc
+                              ; typeOf? = ty
+                              }
+
+open OperandInstances public
