@@ -3,6 +3,7 @@ module verse.language.arch where
 open import verse.error
 open import verse.language.types
 
+
 -- An architecture is a generic class of machines. It determines the
 -- instructions and registers that machine of that architecture can
 -- potentially support. Besides registers, the instructions can use
@@ -16,7 +17,7 @@ record Arch : Set₁ where
     -- The instruction set.
     instruction   : Set
 
-    -- The registered supported by machines
+    -- The registers supported by machines
     register      : Set
 
     -- Type that captures stack offset in this architecture. Merely
@@ -28,10 +29,8 @@ record Arch : Set₁ where
     -- Type that captures constants of the architecture.
     constant      : Set
 
-    -- Get the type of a register.
-    typeOf        : register → {d : Dim}{k : Kind {d} ✓} → Type k
 
-open Arch ⦃ ... ⦄
+open Arch ⦃...⦄
 
 -- When generating instructions for a particular machine of a given
 -- architecture there can be errors due to unsupported registers or
@@ -39,6 +38,8 @@ open Arch ⦃ ... ⦄
 data MachineError (arch : Arch) : Set where
   Register_Unsupported    : register    → MachineError arch
   Instruction_Unsupported : instruction → MachineError arch
+  Type_Unsupported        : {d : Dim} → {k : Kind {d} ✓} → Type k → MachineError arch
+
 
 -- A machine is essentially a restriction on the architecture. It gives
 -- predicates to check whether a register or instruction is supported.
@@ -48,30 +49,70 @@ record Machine (arch : Arch) : Set₁ where
 
     -- Check whether this register is supported and raise an error
     -- otherwise.
-    register?    : register    → Error (MachineError arch)
+    register?    : register → Error (MachineError arch)
 
     -- Check whether this instruction is supported and raise an error
     -- otherwise.
     instruction? : instruction → Error (MachineError arch)
 
+    -- Check whether this type is supported and raise an error
+    -- otherwise.
+    type?        : {d : Dim} → {k : Kind {d} ✓} → Type k → Error (MachineError arch)
+
 
 -- Local variable is either allocated on the stack or is a register.
-data Local (arch : Arch) : Set where
-     onStack    : {d : Dim}{k : Kind {d} ✓} → stackOffset → Type k → Local arch
-     inRegister : register    → Local arch
 
-data OpType : Set where
-     ReadOnly  : OpType
-     ReadWrite : OpType
+data Access :  Set where
+  ReadWrite : Access
+  ReadOnly  : Access
 
--- Operands associated with an architecture.
-data Operand (arch : Arch) (o : OpType) : Set where
 
-     -- It can be a function parameter.
-     param : {d : Dim} → {k : Kind {d} ✓} → stackOffset → Type k →  Operand arch o
+private
+  module DataStore {d : Dim}{k : Kind {d} ✓}(arch : Arch)(acc : Access) where
 
-     -- Or a register
-     reg   : register → Operand arch o
+    data Parameter : Type k → Set where
+      param : {ty : Type k} → stackOffset → Parameter ty
 
-     -- Or a local variable. Local variable can be either on a stack or a register.
-     local : Local arch →  Operand arch o
+
+    data Register : Type k → Set where
+      reg : {ty : Type k} → register → Register ty
+
+    data Local : Type k → Set where
+      localStack : {ty : Type k} → stackOffset → Local ty
+      localReg   : {ty : Type k} → register    → Local ty
+
+open DataStore public
+
+
+-- Operand Typeclass
+
+record Operand {d : Dim}{k : Kind {d} ✓}(A : Set) : Set where
+  field
+    access? : Access
+    typeOf? : Type k
+
+open Operand
+
+
+-- Operand instances
+
+private
+  module OperandInstances {arch : Arch}{acc : Access}{d : Dim}{k : Kind {d} ✓}{ty : Type k} where
+
+    instance
+      paramIsOperand : Operand (Parameter arch acc ty)
+      paramIsOperand = record { access? = acc
+                              ; typeOf? = ty
+                              }
+
+      regIsOperand : Operand (Register arch acc ty)
+      regIsOperand = record { access? = acc
+                            ; typeOf? = ty
+                            }
+
+      localIsOperand : Operand (Local arch acc ty)
+      localIsOperand = record { access? = acc
+                              ; typeOf? = ty
+                              }
+
+open OperandInstances public
