@@ -38,6 +38,7 @@ open Arch ⦃...⦄
 data MachineError (arch : Arch) : Set where
   Register_Unsupported    : register    → MachineError arch
   Instruction_Unsupported : instruction → MachineError arch
+  Type_Unsupported        : {d : Dim} → {k : Kind {d} ✓} → Type k → MachineError arch
 
 
 -- A machine is essentially a restriction on the architecture. It gives
@@ -53,6 +54,10 @@ record Machine (arch : Arch) : Set₁ where
     -- Check whether this instruction is supported and raise an error
     -- otherwise.
     instruction? : instruction → Error (MachineError arch)
+
+    -- Check whether this type is supported and raise an error
+    -- otherwise.
+    type?        : {d : Dim} → {k : Kind {d} ✓} → Type k → Error (MachineError arch)
 
 
 -- Local variable is either allocated on the stack or is a register.

@@ -1,20 +1,14 @@
 module verse.error where
 
-open import Level
-open import Category.Functor
-open import Function
-open import Relation.Nullary
-open import Relation.Nullary.Negation
-import Data.Maybe as Maybe
-
 open import Data.Maybe as Maybe public
                                 using    (functor)
                                 renaming ( Maybe to Error
                                          ; just  to error:
                                          ; nothing to ✓
                                          )
-
 open import Data.Product
+open import Relation.Nullary
+open import Relation.Nullary.Negation
 
 data Expect (K : Set) : Set where
   expected   : K → Expect K

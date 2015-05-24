@@ -1,8 +1,12 @@
 module verse.arch.c.c-arch where
 
 open import Data.String
+open import Data.Nat renaming (_≤?_ to _≤?ℕ_)
+open import Relation.Nullary
 
+open import verse.error
 open import verse.language.arch
+open import verse.language.types
 
 
 -- Define C Architecture
@@ -33,18 +37,27 @@ record ToCvar (A : Set) : Set where
 
 -- Define C Machine
 
-{-
+private
+  module cMachine where
 
-CRegister? : CRegister → Error (MachineError c-arch)
-CRegister? _ = ✓
+    CRegister? : CVariable → Error (MachineError c-arch)
+    CRegister? _ = ✓
 
+    CInstruction? : CInstruction → Error (MachineError c-arch)
+    CInstruction? _ = ✓
 
-CInstruction? : CInstruction → Error (MachineError c-arch)
-CInstruction? (_ CInstruction.+≔ _) = ✓
-CInstruction? other = error: Instruction other Unsupported
+    CType? : {d : Dim} → {k : Kind {d} ✓} → Type k → Error (MachineError c-arch)
+    CType? (word n en) with n ≤?ℕ 3
+    ...                | yes _   = ✓
+    ...                | no  _   = error: (Type word n en Unsupported)
+    CType? (array k of w) with CType? w
+    ...                   | ✓ = ✓
+    ...                   | _ = error: (Type array k of w Unsupported)
+    CType? (t ⋆) with CType? t
+    ...          | ✓ = ✓
+    ...          | _ = error: (Type t ⋆ Unsupported)
 
+    c-mach : Machine c-arch
+    c-mach = MakeMachine CRegister? CInstruction? CType?
 
-c-mach : Machine c-arch
-c-mach = MakeMachine CRegister? CInstruction?
-
--}
+open cMachine public

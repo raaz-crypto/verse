@@ -1,8 +1,7 @@
--- Type capturing endianness.
-
 module verse.endian where
 
 
+-- Type capturing endianness.
 data endian : Set where
   little    : endian  -- captures little endian
   big       : endian  -- big endian
