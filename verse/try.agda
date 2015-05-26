@@ -2,16 +2,18 @@ module verse.try where
 
 open import Data.List
 open import Data.Nat
-open import Data.String
-open import Data.Unit using (⊤)
+open import Data.Product
+open import Data.String                 hiding (_++_)
+open import Data.Unit                   using (⊤)
 open import IO
 import IO.Primitive as Prim
 
-
 open import verse.arch.c.c-arch
 open import verse.arch.c.c-instructions
+open import verse.endian
 open import verse.error
 open import verse.language.arch
+open import verse.language.function
 open import verse.language.instructions
 open import verse.language.types
 
@@ -52,28 +54,14 @@ my_sum {suc x} a = λ m → my_sum {x} (m + a)
 
 ----------------------------------------------------------
 
-operands : ℕ → Set₁
-operands 0 = Set
-operands (suc n) = Set → operands n
 
+foo0 : FuncDecl c-arch
+foo0 = function "foo" void []
 
-multi : operands 1
-multi ℕ = ℕ
-
---operands : ℕ → Set
---operands 0 = ({d : Dim}{k : Kind {d}  ✓}{ty : Type k}{acc : Access} → Parameter c-arch acc ty)
---operands (suc x) = ({d : Dim}{k : Kind {d}  ✓}{ty : Type k}{acc : Access} → Parameter c-arch acc ty) → operands x
-
---func : operands 3
---func  = λ op1 op2 op3 → op1 +≔ op2 Data.List.++ op2 +≔ op3 Data.List.++ op1 +≔ op3
-
-----------------------------------------------------------
+foo1 : FuncDecl c-arch
+foo1 = function "foo" (● param Host16 , void) (λ op3 → op3 +≔ op3 ++ op3 +≔ op3 ++ op3 +≔ op3 ++ op3 +≔ op3 ++ op3 +≔ op3 ++ op3 +≔ op3)
 
 {-
-data Function : {n : ℕ} → operands n → Set where
-  function : {n : ℕ} → String → (f : operands n) → Function f
+foo2 : Function c-arch {3} ⟪ {!!} ⟫
+foo2 = function "foo" {!!} λ op1 → []
 -}
-
---foo : Function {1} (op1 → List (instruction c-arch))
---foo = function "foo" func
-
