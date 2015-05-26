@@ -18,7 +18,7 @@ private
       cvar_ : String → CVariable
 
     data CInstruction : Set where
-      _+≐_  : CVariable → CVariable → CInstruction
+      _+≔_  : CVariable → CVariable → CInstruction
 
     data CConstant : Set where
 
@@ -40,13 +40,13 @@ record ToCvar (A : Set) : Set where
 private
   module cMachine where
 
-    CRegister? : CVariable → Error (MachineError c-arch)
+    CRegister? : CVariable → Error (UserError c-arch)
     CRegister? _ = ✓
 
-    CInstruction? : CInstruction → Error (MachineError c-arch)
+    CInstruction? : CInstruction → Error (UserError c-arch)
     CInstruction? _ = ✓
 
-    CType? : {d : Dim} → {k : Kind {d} ✓} → Type k → Error (MachineError c-arch)
+    CType? : {d : Dim} → {k : Kind {d} ✓} → Type k → Error (UserError c-arch)
     CType? (word n en) with n ≤?ℕ 3
     ...                | yes _   = ✓
     ...                | no  _   = error: (Type word n en Unsupported)

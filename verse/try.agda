@@ -20,16 +20,17 @@ open import verse.language.types
 open Arch
 open Operand
 
-op1 : Parameter c-arch ReadWrite Host16
+op1 : Parameter c-arch ReadWrite (word 5 host)
 op1 = param (cvar "op1")
 
-op2 : Register c-arch ReadOnly Host16
+op2 : Register c-arch ReadOnly (word 5 host)
 op2 = reg (cvar "op2")
 
 open AddEq ⦃...⦄
 
-try : List (instruction c-arch)
-try = op1 +≔ op2
+
+try : Statement c-mach
+try = op1 ←+ op2
 
 ----------------------------------------------------------
 {-
@@ -55,13 +56,17 @@ my_sum {suc x} a = λ m → my_sum {x} (m + a)
 ----------------------------------------------------------
 
 
-foo0 : FuncDecl c-arch
-foo0 = function "foo" void []
+foo0 : FuncDecl c-mach
+foo0 = function "foo" void void
 
-foo1 : FuncDecl c-arch
-foo1 = function "foo" (● param Host16 , void) (λ op3 → op3 +≔ op3 ++ op3 +≔ op3 ++ op3 +≔ op3 ++ op3 +≔ op3 ++ op3 +≔ op3 ++ op3 +≔ op3)
 
-{-
-foo2 : Function c-arch {3} ⟪ {!!} ⟫
-foo2 = function "foo" {!!} λ op1 → []
--}
+foo1 : FuncDecl c-mach
+foo1 = function "foo" (● param Host16 ∣ void)
+       (λ op3 → 
+         Begin
+           op3 ←+ op3 ∷
+           op3 ←+ op3 ∷
+           op3 ←+ op3 ∷
+           []
+         End
+       )

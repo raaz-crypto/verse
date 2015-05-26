@@ -32,33 +32,6 @@ record Arch : Set₁ where
 
 open Arch ⦃...⦄
 
--- When generating instructions for a particular machine of a given
--- architecture there can be errors due to unsupported registers or
--- instructions. This type captures such errors.
-data MachineError (arch : Arch) : Set where
-  Register_Unsupported    : register    → MachineError arch
-  Instruction_Unsupported : instruction → MachineError arch
-  Type_Unsupported        : {d : Dim} → {k : Kind {d} ✓} → Type k → MachineError arch
-
-
--- A machine is essentially a restriction on the architecture. It gives
--- predicates to check whether a register or instruction is supported.
-record Machine (arch : Arch) : Set₁ where
-  constructor MakeMachine
-  field
-
-    -- Check whether this register is supported and raise an error
-    -- otherwise.
-    register?    : register → Error (MachineError arch)
-
-    -- Check whether this instruction is supported and raise an error
-    -- otherwise.
-    instruction? : instruction → Error (MachineError arch)
-
-    -- Check whether this type is supported and raise an error
-    -- otherwise.
-    type?        : {d : Dim} → {k : Kind {d} ✓} → Type k → Error (MachineError arch)
-
 
 -- Local variable is either allocated on the stack or is a register.
 
@@ -116,3 +89,32 @@ private
                               }
 
 open OperandInstances public
+
+
+-- When generating instructions for a particular machine of a given
+-- architecture there can be errors due to unsupported registers, instructions or type mismatch.
+-- This type captures all such errors.
+data UserError (arch : Arch) : Set where
+  Register_Unsupported    : register    → UserError arch
+  Instruction_Unsupported : instruction → UserError arch
+  Type_Unsupported        : {d : Dim}{k : Kind {d} ✓} → Type k → UserError arch
+  Type_MismatchWith_      : {d₁ d₂ : Dim}{k₁ : Kind {d₁} ✓}{k₂ : Kind {d₂} ✓} → Type k₁ → Type k₂ → UserError arch
+  ReadOnlyOperand         : UserError arch
+
+-- A machine is essentially a restriction on the architecture. It gives
+-- predicates to check whether a register or instruction is supported.
+record Machine (arch : Arch) : Set₁ where
+  constructor MakeMachine
+  field
+
+    -- Check whether this register is supported and raise an error
+    -- otherwise.
+    register?    : register → Error (UserError arch)
+
+    -- Check whether this instruction is supported and raise an error
+    -- otherwise.
+    instruction? : instruction → Error (UserError arch)
+
+    -- Check whether this type is supported and raise an error
+    -- otherwise.
+    type?        : {d : Dim} → {k : Kind {d} ✓} → Type k → Error (UserError arch)

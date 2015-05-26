@@ -2,7 +2,7 @@ module verse.language.function where
 
 open import Data.List
 open import Data.Nat
-open import Data.Product        using (_×_)
+open import Data.Product        public
 open import Data.String
 open import Data.Unit           using (⊤)
 
@@ -12,50 +12,54 @@ open import verse.language.types
 
 open Arch
 
-infixr 4 _,_
-infix  5 ● ○
-
-{--
-infixr 2 _×_
-
-data _×_ (A B : Set) : Set where
-  _,_ : A → B → A × B
-
-fst : {A B : Set} → A × B → A
-fst (x , y) = x
-
-snd : {A B : Set} → A × B → B
-snd (x , y) = y
---}
+infix  5 ● ○ ⟪_⟫
 
 
-Typeⁿ : ℕ → Set
-Typeⁿ zero        = ⊤
-Typeⁿ (suc zero)    = {d : Dim}{k : Kind {d} ✓} → Type k
-Typeⁿ (suc (suc n)) = ({d : Dim}{k : Kind {d} ✓} → Type k) × Typeⁿ (suc n)
+private
+  Typeⁿ : ℕ → Set
+  Typeⁿ zero        = ⊤
+  Typeⁿ (suc zero)    = {d : Dim}{k : Kind {d} ✓} → Type k
+  Typeⁿ (suc (suc n)) = ({d : Dim}{k : Kind {d} ✓} → Type k) × Typeⁿ (suc n)
 
 
-data OpType : Set where
-  param : OpType
-  local : OpType
+-- Data type that captures type of an argument, whether it is local or parameter.
+data VarType : Set where
+  param : VarType
+  local : VarType
 
 
-data Op : Set where
-  ● : OpType → {d : Dim}{k : Kind {d} ✓} → Type k → Op
-  ○ : OpType → {d : Dim}{k : Kind {d} ✓} → Type k → Op
+-- Data type that captures a single argument declaration.
+data VarDecl : Set where
+  ● : VarType → {d : Dim}{k : Kind {d} ✓} → Type k → VarDecl
+  ○ : VarType → {d : Dim}{k : Kind {d} ✓} → Type k → VarDecl
 
 
+-- Data type that captures a series of argument declaration of a function.
 data ArgDecl : {n : ℕ} → Set → Set where
   void : ArgDecl {zero} (Typeⁿ zero)
-  _,_  : {n : ℕ} → Op → ArgDecl {n} (Typeⁿ n) → ArgDecl {suc n} (Typeⁿ (suc n))
+  _∣_  : {n : ℕ} → VarDecl → ArgDecl {n} (Typeⁿ n) → ArgDecl {suc n} (Typeⁿ (suc n))
 
 
-funcType : Arch → {n : ℕ} → ArgDecl {n} (Typeⁿ n) → Set
-funcType arch void          = List (instruction arch)
-funcType arch (● param ty , rest) = Parameter arch ReadWrite ty → funcType arch rest
-funcType arch (○ param ty , rest) = Parameter arch ReadOnly ty → funcType arch rest
-funcType arch (● local ty , rest) = Local arch ReadWrite ty → funcType arch rest
-funcType arch (○ local ty , rest) = Local arch ReadOnly ty → funcType arch rest
+-- Data type that captures a statment in a block.
+data Statement {arch : Arch}(mach : Machine arch) : Set where
+  ⟪_⟫ : List (instruction arch) × Error (UserError arch) → Statement mach
 
-data FuncDecl (arch : Arch) : Set where
-  function : {n : ℕ} → String → (args : ArgDecl {n} (Typeⁿ n)) → (f : funcType arch args) → FuncDecl arch
+
+-- Data type that captures a block of statements.
+data Block {arch : Arch}(mach : Machine arch) : Set where
+  void      : Block mach
+  Begin_End : List (Statement mach) → Block mach
+
+
+private
+  funcType : {arch : Arch}(mach : Machine arch) → {n : ℕ} → ArgDecl {n} (Typeⁿ n) → Set
+  funcType {arch} mach void                = Block mach
+  funcType {arch} mach (● param ty ∣ rest) = Parameter arch ReadWrite ty → funcType mach rest
+  funcType {arch} mach (○ param ty ∣ rest) = Parameter arch ReadOnly ty → funcType mach rest
+  funcType {arch} mach (● local ty ∣ rest) = Local arch ReadWrite ty → funcType mach rest
+  funcType {arch} mach (○ local ty ∣ rest) = Local arch ReadOnly ty → funcType mach rest
+
+
+-- Data type that captures a function declaration type.
+data FuncDecl {arch : Arch}(mach : Machine arch) : Set where
+  function : {n : ℕ} → String → (args : ArgDecl {n} (Typeⁿ n)) → (f : funcType mach args) → FuncDecl mach
