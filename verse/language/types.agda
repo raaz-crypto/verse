@@ -1,12 +1,15 @@
 module verse.language.types where
 
-open import Data.Nat using  (ℕ ; suc)
+open import Data.Nat         using    ( ℕ ; suc )
+                             renaming ( _≟_ to _≟ℕ_ )
 open import Function
 open import Relation.Binary
+open import Relation.Binary.PropositionalEquality using ( refl ; _≡_ )
 open import Relation.Nullary
-
 import Level
-open import Data.Unit public using () renaming ( tt to scalar )
+open import Data.Unit        public
+                             using    ()
+                             renaming ( tt to scalar )
 
 open import verse.endian
 open import verse.error
@@ -62,6 +65,8 @@ data Type  :  {d : Dim} → Kind {d}  ✓ → Set where
              → Type ⟨∞⟩
 
 
+
+
 ------------------- Type short hands ---------------------------
 
 
@@ -88,6 +93,7 @@ Host32 = Word32 host
 Host64 = Word64 host
 
 
+----------------------------------------------------------------
 {-
 
 index? : {n : ℕ} → Index n → Index n  → Error IndexError

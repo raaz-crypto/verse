@@ -1,7 +1,7 @@
 module verse.error where
 
 open import Data.Maybe as Maybe public
-                                using    (functor)
+                                using    ()
                                 renaming ( Maybe to Error
                                          ; just  to error:
                                          ; nothing to ✓

@@ -1,12 +1,13 @@
 module verse.arch.c.c-arch where
 
 open import Data.String
-open import Data.Nat renaming (_≤?_ to _≤?ℕ_)
+open import Data.Nat renaming ( _≤?_ to _≤?ℕ_ )
 open import Relation.Nullary
 
-open import verse.error
 open import verse.language.arch
+open import verse.language.machine
 open import verse.language.types
+open import verse.language.userError
 
 
 -- Define C Architecture
@@ -48,14 +49,14 @@ private
 
     CType? : {d : Dim} → {k : Kind {d} ✓} → Type k → Error (UserError c-arch)
     CType? (word n en) with n ≤?ℕ 3
-    ...                | yes _   = ✓
-    ...                | no  _   = error: (Type word n en Unsupported)
+    ...                |    yes _ = ✓
+    ...                |    no  _ = error: (Type word n en Unsupported)
     CType? (array k of w) with CType? w
-    ...                   | ✓ = ✓
-    ...                   | _ = error: (Type array k of w Unsupported)
+    ...                   |    ✓ = ✓
+    ...                   |    _ = error: (Type array k of w Unsupported)
     CType? (t ⋆) with CType? t
-    ...          | ✓ = ✓
-    ...          | _ = error: (Type t ⋆ Unsupported)
+    ...          |    ✓ = ✓
+    ...          |    _ = error: (Type t ⋆ Unsupported)
 
     c-mach : Machine c-arch
     c-mach = MakeMachine CRegister? CInstruction? CType?

@@ -1,14 +1,15 @@
 module verse.arch.c.c-instructions where
 
 open import Data.List
-open import Relation.Binary.PropositionalEquality using (_≡_)
+open import Relation.Binary.PropositionalEquality using ( _≡_ )
 
 open import verse.arch.c.c-arch
-open import verse.error
 open import verse.language.arch
 open import verse.language.function
+open import verse.language.machine
 open import verse.language.instructions
 open import verse.language.types
+open import verse.language.userError
 
 
 -- instances of ToCvar for Data Types Parameter, Register and Local
@@ -78,6 +79,6 @@ instance
                  → ⦃ A' : Operand {d}{k} A ⦄ ⦃ B' : Operand {d}{k} B ⦄
                  → A → B → Statement c-mach
           helper op₁ op₂ with access? A' | CType? (typeOf? A')
-          ...            |    ReadWrite  | ✓                  = ⟪ [ toCvar op₁ +≔ toCvar op₂ ] ,  ✓ ⟫
-          ...            |    ReadOnly   | _                   = ⟪ [ toCvar op₁ +≔ toCvar op₂ ] ,  error: ReadOnlyOperand ⟫
-          ...            |    _          | err                 = ⟪ [ toCvar op₁ +≔ toCvar op₂ ] ,  err ⟫
+          ...            |    ReadWrite  | ✓                  = ⟪ [ toCvar op₁ +≔ toCvar op₂ ] ∣  ✓ ⟫
+          ...            |    ReadOnly   | _                   = ⟪ [ toCvar op₁ +≔ toCvar op₂ ] ∣ error: ReadOnlyOperand ⟫
+          ...            |    _          | err'                = ⟪ [ toCvar op₁ +≔ toCvar op₂ ] ∣ err' ⟫

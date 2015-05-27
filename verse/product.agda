@@ -1,6 +1,7 @@
 module verse.product where
 
-open import Data.Product public
+open import Data.Product        public
+                                using    ( _×_ ; _,_ ; proj₁ ; proj₂ )
 open import Data.Unit           using    ( ⊤ )
 open import Data.Nat            hiding   ( _⊔_ )
                                 renaming ( _≤_ to _≤ℕ_; _≤?_ to _≤?ℕ_ )

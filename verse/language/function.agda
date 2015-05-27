@@ -2,17 +2,18 @@ module verse.language.function where
 
 open import Data.List
 open import Data.Nat
-open import Data.Product        public
+open import Data.Product
 open import Data.String
-open import Data.Unit           using (⊤)
+open import Data.Unit           using ( ⊤ )
 
-open import verse.error
 open import verse.language.arch
+open import verse.language.machine
 open import verse.language.types
+open import verse.language.userError
 
 open Arch
 
-infix  5 ● ○ ⟪_⟫
+infix  5 rw ro ⟪_∣_⟫
 
 
 private
@@ -30,8 +31,8 @@ data VarType : Set where
 
 -- Data type that captures a single argument declaration.
 data VarDecl : Set where
-  ● : VarType → {d : Dim}{k : Kind {d} ✓} → Type k → VarDecl
-  ○ : VarType → {d : Dim}{k : Kind {d} ✓} → Type k → VarDecl
+  rw : VarType → {d : Dim}{k : Kind {d} ✓} → Type k → VarDecl
+  ro : VarType → {d : Dim}{k : Kind {d} ✓} → Type k → VarDecl
 
 
 -- Data type that captures a series of argument declaration of a function.
@@ -42,7 +43,7 @@ data ArgDecl : {n : ℕ} → Set → Set where
 
 -- Data type that captures a statment in a block.
 data Statement {arch : Arch}(mach : Machine arch) : Set where
-  ⟪_⟫ : List (instruction arch) × Error (UserError arch) → Statement mach
+  ⟪_∣_⟫ : List (instruction arch) → (err : Error (UserError arch)) → Statement mach
 
 
 -- Data type that captures a block of statements.
@@ -54,10 +55,10 @@ data Block {arch : Arch}(mach : Machine arch) : Set where
 private
   funcType : {arch : Arch}(mach : Machine arch) → {n : ℕ} → ArgDecl {n} (Typeⁿ n) → Set
   funcType {arch} mach void                = Block mach
-  funcType {arch} mach (● param ty ∣ rest) = Parameter arch ReadWrite ty → funcType mach rest
-  funcType {arch} mach (○ param ty ∣ rest) = Parameter arch ReadOnly ty → funcType mach rest
-  funcType {arch} mach (● local ty ∣ rest) = Local arch ReadWrite ty → funcType mach rest
-  funcType {arch} mach (○ local ty ∣ rest) = Local arch ReadOnly ty → funcType mach rest
+  funcType {arch} mach (rw param ty ∣ rest) = Parameter arch ReadWrite ty → funcType mach rest
+  funcType {arch} mach (ro param ty ∣ rest) = Parameter arch ReadOnly ty → funcType mach rest
+  funcType {arch} mach (rw local ty ∣ rest) = Local arch ReadWrite ty → funcType mach rest
+  funcType {arch} mach (ro local ty ∣ rest) = Local arch ReadOnly ty → funcType mach rest
 
 
 -- Data type that captures a function declaration type.

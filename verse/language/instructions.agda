@@ -1,11 +1,12 @@
 module verse.language.instructions where
 
 open import Data.List
-open import Relation.Binary.PropositionalEquality using (_≡_ ; refl)
+open import Relation.Binary.PropositionalEquality using ( _≡_ )
 
 open import verse.error
 open import verse.language.arch
 open import verse.language.function
+open import verse.language.machine
 open import verse.language.types
 
 open Arch

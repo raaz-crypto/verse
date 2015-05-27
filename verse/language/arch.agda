@@ -91,30 +91,15 @@ private
 open OperandInstances public
 
 
--- When generating instructions for a particular machine of a given
--- architecture there can be errors due to unsupported registers, instructions or type mismatch.
--- This type captures all such errors.
-data UserError (arch : Arch) : Set where
-  Register_Unsupported    : register    → UserError arch
-  Instruction_Unsupported : instruction → UserError arch
-  Type_Unsupported        : {d : Dim}{k : Kind {d} ✓} → Type k → UserError arch
-  Type_MismatchWith_      : {d₁ d₂ : Dim}{k₁ : Kind {d₁} ✓}{k₂ : Kind {d₂} ✓} → Type k₁ → Type k₂ → UserError arch
-  ReadOnlyOperand         : UserError arch
 
--- A machine is essentially a restriction on the architecture. It gives
--- predicates to check whether a register or instruction is supported.
-record Machine (arch : Arch) : Set₁ where
-  constructor MakeMachine
-  field
-
-    -- Check whether this register is supported and raise an error
-    -- otherwise.
-    register?    : register → Error (UserError arch)
-
-    -- Check whether this instruction is supported and raise an error
-    -- otherwise.
-    instruction? : instruction → Error (UserError arch)
-
-    -- Check whether this type is supported and raise an error
-    -- otherwise.
-    type?        : {d : Dim} → {k : Kind {d} ✓} → Type k → Error (UserError arch)
+{-
+typeEq? : {arch : Arch}{d₁ d₂ : Dim}{k₁ : Kind {d₁} ✓}{k₂ : Kind {d₂} ✓} → Type k₁ → Type k₂ → Error (UserError arch)
+typeEq? (word n₁ en₁) (word n₂ en₂) with n₁ ≟ℕ n₂ | en₁ ≟En en₂
+...                                 |    yes _    | yes _       = ✓
+...                                 |    _        | _           = error: (Type word n₁ en₁ MismatchWith word n₂ en₂)
+typeEq? (word n en) ty₂ = error: (Type word n en MismatchWith ty₂)
+typeEq? (array k₁ of x) (array k₂ of y) = {!!}
+typeEq? (array k₁ of x) ty₂ = error: (Type array k₁ of x MismatchWith ty₂)
+typeEq? (x ⋆) (y ⋆) = {!!}
+typeEq? (x ⋆) ty₂ = error: (Type x ⋆ MismatchWith ty₂)
+-}

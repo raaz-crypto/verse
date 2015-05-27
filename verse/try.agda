@@ -61,7 +61,7 @@ foo0 = function "foo" void void
 
 
 foo1 : FuncDecl c-mach
-foo1 = function "foo" (● param Host16 ∣ void)
+foo1 = function "foo" (rw param Host16 ∣ void)
        (λ op3 → 
          Begin
            op3 ←+ op3 ∷
