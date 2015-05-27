@@ -15,8 +15,8 @@ data endian : Set where
 
 
 -- To decide if two endians are equal
-eqEn? : Decidable {A = endian}{B = endian} _≡_
-eqEn? = helper
+endianEq? : Decidable {A = endian}{B = endian} _≡_
+endianEq? = helper
   where helper : (x : endian) → (y : endian) → Dec (x ≡ y)
         helper little little = yes refl
         helper big    big    = yes refl

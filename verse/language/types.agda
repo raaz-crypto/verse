@@ -1,11 +1,7 @@
 module verse.language.types where
 
 open import Data.Nat         using    ( ℕ ; suc )
-                             renaming ( _≟_ to _≟ℕ_ )
 open import Function
-open import Relation.Binary
-open import Relation.Binary.PropositionalEquality using ( refl ; _≡_ )
-open import Relation.Nullary
 import Level
 open import Data.Unit        public
                              using    ()
@@ -65,8 +61,6 @@ data Type  :  {d : Dim} → Kind {d}  ✓ → Set where
              → Type ⟨∞⟩
 
 
-
-
 ------------------- Type short hands ---------------------------
 
 
@@ -101,9 +95,6 @@ index? as bs = unless incr as ≤? bs raise (index as ≮ bs ∎)
   where incr : {n : ℕ} → Index n → Index n
         incr {0} a            = suc a
         incr {suc n} (a , aˢ) = a , incr aˢ
-
-
--------------------- Definition of types --------------------
 
 
 Type ⟨scalar⟩     = Type (bounded Scalar) ✓

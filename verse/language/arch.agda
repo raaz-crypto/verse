@@ -90,16 +90,3 @@ private
 
 open OperandInstances public
 
-
-
-{-
-typeEq? : {arch : Arch}{d₁ d₂ : Dim}{k₁ : Kind {d₁} ✓}{k₂ : Kind {d₂} ✓} → Type k₁ → Type k₂ → Error (UserError arch)
-typeEq? (word n₁ en₁) (word n₂ en₂) with n₁ ≟ℕ n₂ | en₁ ≟En en₂
-...                                 |    yes _    | yes _       = ✓
-...                                 |    _        | _           = error: (Type word n₁ en₁ MismatchWith word n₂ en₂)
-typeEq? (word n en) ty₂ = error: (Type word n en MismatchWith ty₂)
-typeEq? (array k₁ of x) (array k₂ of y) = {!!}
-typeEq? (array k₁ of x) ty₂ = error: (Type array k₁ of x MismatchWith ty₂)
-typeEq? (x ⋆) (y ⋆) = {!!}
-typeEq? (x ⋆) ty₂ = error: (Type x ⋆ MismatchWith ty₂)
--}

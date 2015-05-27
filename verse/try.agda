@@ -1,5 +1,6 @@
 module verse.try where
 
+open import Function
 open import Data.List
 open import Data.Nat
 open import Data.Product
@@ -55,14 +56,17 @@ my_sum {suc x} a = λ m → my_sum {x} (m + a)
 
 ----------------------------------------------------------
 
+--args : ArgDecl {3} (Typeⁿ 3)
+--args = ⟦ rw param Host16 ∣ ro param Host32 ∣ ro param (Word32 big) ⟧
+
 
 foo0 : FuncDecl c-mach
 foo0 = function "foo" void void
 
 
 foo1 : FuncDecl c-mach
-foo1 = function "foo" (rw param Host16 ∣ void)
-       (λ op3 → 
+foo1 = function "foo" (⟦ rw param Host16 ∣ ro param Host32 ⟧)
+       (λ op2 op3 → 
          Begin
            op3 ←+ op3 ∷
            op3 ←+ op3 ∷
