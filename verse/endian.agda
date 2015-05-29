@@ -1,8 +1,6 @@
 module verse.endian where
 
-open import Relation.Binary
-open import Relation.Binary.PropositionalEquality using ( refl ; _≡_ )
-open import Relation.Nullary
+open import Data.Bool
 
 
 -- Type capturing endianness.
@@ -15,15 +13,8 @@ data endian : Set where
 
 
 -- To decide if two endians are equal
-endianEq? : Decidable {A = endian}{B = endian} _≡_
-endianEq? = helper
-  where helper : (x : endian) → (y : endian) → Dec (x ≡ y)
-        helper little little = yes refl
-        helper big    big    = yes refl
-        helper host   host   = yes refl
-        helper little big    = no λ()
-        helper little host   = no λ()
-        helper big    little = no (λ ())
-        helper big    host   = no (λ ())
-        helper host   little = no (λ ())
-        helper host   big    = no (λ ())
+_endian≟_ : endian → endian → Bool
+_endian≟_ little little = true
+_endian≟_ big    big    = true
+_endian≟_ host   host   = true
+_endian≟_  _      _     = false

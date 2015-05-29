@@ -4,8 +4,8 @@ open import verse.language.arch
 open import verse.language.types
 open import verse.language.userError
 
-
 open Arch ⦃...⦄
+
 
 -- A machine is essentially a restriction on the architecture. It gives
 -- predicates to check whether a register or instruction is supported.

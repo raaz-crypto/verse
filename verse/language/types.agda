@@ -63,7 +63,6 @@ data Type  :  {d : Dim} → Kind {d}  ✓ → Set where
 
 ------------------- Type short hands ---------------------------
 
-
 -- The byte type
 Byte   : Type ⟨scalar⟩
 
@@ -72,6 +71,7 @@ Byte   : Type ⟨scalar⟩
 Word16 : endian → Type ⟨scalar⟩
 Word32 : endian → Type ⟨scalar⟩
 Word64 : endian → Type ⟨scalar⟩
+
 
 -- Haskell word types that uses host endian.
 Host16 : Type ⟨scalar⟩

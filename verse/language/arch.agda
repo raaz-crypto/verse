@@ -89,4 +89,3 @@ private
                               }
 
 open OperandInstances public
-
