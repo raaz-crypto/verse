@@ -1,10 +1,9 @@
+-- This module is temporary and is used for experimentation 
+-- and debugging during development.
 module verse.try where
 
-open import Function
-open import Data.List
 open import Data.Nat
 open import Data.Product
-open import Data.String                 hiding (_++_)
 open import Data.Unit                   using (⊤)
 open import IO
 import IO.Primitive as Prim
@@ -12,28 +11,30 @@ import IO.Primitive as Prim
 open import verse.arch.c.c-arch
 open import verse.arch.c.c-instructions
 open import verse.endian
-open import verse.error
 open import verse.language.arch
 open import verse.language.function
 open import verse.language.instructions
 open import verse.language.types
+open import verse.language.userError
+open import verse.util.typeEq
 
 open Arch
 open Operand
 
-op1 : Parameter c-arch ReadWrite (word 5 host)
+
+op1 : Parameter c-arch ReadWrite (word 2 host)
 op1 = param (cvar "op1")
 
-op2 : Register c-arch ReadOnly (word 5 host)
+op2 : Register c-arch ReadOnly (word 2 host)
 op2 = reg (cvar "op2")
 
 open AddEq ⦃...⦄
 
-
 try : Statement c-mach
-try = op1 ←+ op2
+try = op1 +← op2
 
 ----------------------------------------------------------
+-- For compilation in MAlonzo backend
 {-
 hw : String
 hw = "Hello World Abhijaju"
@@ -46,31 +47,25 @@ main = run main'
 -}
 ----------------------------------------------------------
 
-more : ℕ → Set
-more 0 = ℕ
-more (suc x) = ℕ → more x
-
-my_sum : ∀ {x : ℕ} → ℕ → more x
-my_sum {0}   a = a
-my_sum {suc x} a = λ m → my_sum {x} (m + a)
-
-----------------------------------------------------------
-
---args : ArgDecl {3} (Typeⁿ 3)
---args = ⟦ rw param Host16 ∣ ro param Host32 ∣ ro param (Word32 big) ⟧
-
-
-foo0 : FuncDecl c-mach
-foo0 = function "foo" void void
-
-
-foo1 : FuncDecl c-mach
-foo1 = function "foo" (⟦ rw param Host16 ∣ ro param Host32 ⟧)
-       (λ op2 op3 → 
+foo : FuncDecl c-mach
+foo = function "foo" (⟦ rw Host16 ∣ ro Host32 ⟧) (⟦ rw Host16 ∣ ro (word 7 big) ∣ rw (array ⟨ 5 , 6 ⟩ of Host64) ⟧)
+       (λ p1 p2 l1 l2 arr → 
          Begin
-           op3 ←+ op3 ∷
-           op3 ←+ op3 ∷
-           op3 ←+ op3 ∷
+           p1 +← p1 ∷
+           p1 +← p1 ∷
+           p1 +← p1 ∷
            []
          End
        )
+
+----------------------------------------------------------
+
+ty1 : Type ⟨ 5 , 7 ⟩
+ty1 = array ⟨ 5 , 7 ⟩ of Host16
+
+ty2 : Type (⟨ 5 , 7 ⟩)
+ty2 = array ⟨ 5 , 7 ⟩ of Host16
+
+
+eq : Bool
+eq = _type≟_ {c-arch} ty1 ty2
