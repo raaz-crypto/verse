@@ -51,10 +51,10 @@ foo : FuncDecl c-mach
 foo = function "foo" (⟦ rw Host16 ∣ ro Host32 ⟧) (⟦ rw Host16 ∣ ro (word 7 big) ∣ rw (array ⟨ 5 , 6 ⟩ of Host64) ⟧)
        (λ p1 p2 l1 l2 arr → 
          Begin
-           p1 +← p1 ∷
-           p1 +← p1 ∷
-           p1 +← p1 ∷
-           []
+             p1 +← p1
+           ▸ p1 +← p1
+           ▸ p1 +← p1
+           ◾
          End
        )
 

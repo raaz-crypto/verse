@@ -1,6 +1,7 @@
 module verse.language.function where
 
 open import Data.List           public
+                                renaming ( _∷_ to _▸_ )
 open import Data.Nat
 open import Data.Product
 open import Data.String
@@ -15,8 +16,12 @@ open Arch
 
 infix  4 ⟦_
 infixr 5 _∣_
-infix  6 ⟪_∣_⟫ _⟧
+infix  6 ⟪_∣_⟫ _⟧ _◾
 infix  7 rw ro
+
+
+_◾ : {A : Set} → A → List A
+lst ◾ = lst ▸ []
 
 
 private
