@@ -9,7 +9,7 @@ open Arch ⦃...⦄
 
 -- A machine is essentially a restriction on the architecture. It gives
 -- predicates to check whether a register or instruction is supported.
-record Machine (arch : Arch) : Set₁ where
+record Machine (arch : Arch) : Set where
   constructor MakeMachine
   field
 
