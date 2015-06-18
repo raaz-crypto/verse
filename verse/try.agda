@@ -48,16 +48,21 @@ main = run main'
 ----------------------------------------------------------
 
 foo : FuncDecl c-mach
-foo = function "foo" (⟦ rw Host16 ∣ ro Host32 ⟧) (⟦ rw Host16 ∣ ro (word 7 big) ∣ rw (array ⟨ 5 , 6 ⟩ of Host64) ⟧)
-       (λ p1 p2 l1 l2 arr → 
-         Begin
-             p1 +← p1
-           ▸ p1 +← p1
-           ▸ p1 +← p1
-           ◾
-         End
+foo = function "foo" (⟦ rw Host16 ∣ ro Host32 ⟧)
+       (λ p₁ p₂ → body (⟦ rw auto Host16 ∣ ro inReg (word 7 big) ∣ rw onStack (array ⟨ 5 , 6 ⟩ of Host64) ⟧)
+                   (λ l₁ l₂ arr →
+                                Begin
+                                    p₁ +← p₁
+                                  ▸ p₁ +← p₁
+                                  ▸ p₁ +← p₁
+                                  ◾
+                                End
+                   )
        )
 
+{-
+
+-}
 ----------------------------------------------------------
 
 ty1 : Type ⟨ 5 , 7 ⟩
