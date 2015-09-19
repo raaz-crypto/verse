@@ -48,13 +48,13 @@ data Kind : {dim : Dim} → Error KindError → Set where
 -- Types using dimensions and kinds
 data Type  :  {d : Dim} → Kind {d}  ✓ → Set where
   word       : (n : ℕ)   -- 2^n bytes.
-             → endian
              → Type ⟨scalar⟩
 
-  array_of_  : {n : ℕ}
-             → (k : Kind {finite (suc n)} ✓)
-             → Type ⟨scalar⟩
-             → Type k
+  array_of_endian_  : {n : ℕ}
+              → (k : Kind {finite (suc n)} ✓)
+              → Type ⟨scalar⟩
+              → endian
+              → Type k
 
   _⋆         : {n : ℕ} {k : Kind {finite n} ✓}
              → Type k
@@ -68,24 +68,17 @@ Byte   : Type ⟨scalar⟩
 
 
 -- Endian explicit versions of some haskell types.
-Word16 : endian → Type ⟨scalar⟩
-Word32 : endian → Type ⟨scalar⟩
-Word64 : endian → Type ⟨scalar⟩
+Word16 : Type ⟨scalar⟩
+Word32 : Type ⟨scalar⟩
+Word64 : Type ⟨scalar⟩
 
 
 -- Haskell word types that uses host endian.
-Host16 : Type ⟨scalar⟩
-Host32 : Type ⟨scalar⟩
-Host64 : Type ⟨scalar⟩
 
-Byte   = word 0 host
+Byte   = word 0
 Word16 = word 1
 Word32 = word 2
 Word64 = word 3
-Host16 = Word16 host
-Host32 = Word32 host
-Host64 = Word64 host
-
 
 ----------------------------------------------------------------
 {-
