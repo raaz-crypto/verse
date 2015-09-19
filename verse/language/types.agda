@@ -51,10 +51,10 @@ data Type  :  {d : Dim} → Kind {d}  ✓ → Set where
              → Type ⟨scalar⟩
 
   array_of_endian_  : {n : ℕ}
-              → (k : Kind {finite (suc n)} ✓)
-              → Type ⟨scalar⟩
-              → endian
-              → Type k
+                    → (k : Kind {finite (suc n)} ✓)
+                    → Type ⟨scalar⟩
+                    → endian
+                    → Type k
 
   _⋆         : {n : ℕ} {k : Kind {finite n} ✓}
              → Type k
