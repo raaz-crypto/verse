@@ -47,18 +47,18 @@ data Kind : {dim : Dim} → Error KindError → Set where
 
 -- Types using dimensions and kinds
 data Type  :  {d : Dim} → Kind {d}  ✓ → Set where
-  word       : (n : ℕ)   -- 2^n bytes.
-             → Type ⟨scalar⟩
+     word              : (n : ℕ)   -- 2^n bytes.
+                       → Type ⟨scalar⟩
 
-  array_of_endian_  : {n : ℕ}
-                    → (k : Kind {finite (suc n)} ✓)
-                    → Type ⟨scalar⟩
-                    → endian
-                    → Type k
+     array_of_endian_  : {n : ℕ}
+                       → (k : Kind {finite (suc n)} ✓)
+                       → Type ⟨scalar⟩
+                       → endian
+                       → Type k
 
-  _⋆         : {n : ℕ} {k : Kind {finite n} ✓}
-             → Type k
-             → Type ⟨∞⟩
+     _*                : {n : ℕ} {k : Kind {finite n} ✓}
+                       → Type k
+                       → Type ⟨∞⟩
 
 
 ------------------- Type short hands ---------------------------
