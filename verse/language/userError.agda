@@ -14,5 +14,5 @@ data UserError (arch : Arch) : Set where
   Register_Unsupported    : register    → UserError arch
   Instruction_Unsupported : instruction → UserError arch
   ReadOnlyOperand         : UserError arch
-  Type_Unsupported        : {d : Dim}{k : Kind {d} ✓} → Type k → UserError arch
-  Type_MismatchWith_      : {d₁ d₂ : Dim}{k₁ : Kind {d₁} ✓}{k₂ : Kind {d₂} ✓} → Type k₁ → Type k₂ → UserError arch
+  Type_Unsupported        : {d : Dim} → Type d → UserError arch
+  Type_MismatchWith_      : {d₁ d₂ : Dim} → Type d₁ → Type d₂ → UserError arch

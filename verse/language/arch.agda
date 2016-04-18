@@ -41,28 +41,28 @@ data Access :  Set where
 
 
 private
-  module DataStore {d : Dim}{k : Kind {d} ✓}(arch : Arch)(acc : Access) where
+  module DataStore {d : Dim}(arch : Arch)(acc : Access) where
 
-    data Parameter : Type k → Set where
-      param : {ty : Type k} → stackOffset → Parameter ty
+    data Parameter : Type d → Set where
+      param : {ty : Type d} → stackOffset → Parameter ty
 
 
-    data Register : Type k → Set where
-      reg : {ty : Type k} → register → Register ty
+    data Register : Type d → Set where
+      reg : {ty : Type d} → register → Register ty
 
-    data Local : Type k → Set where
-      localStack : {ty : Type k} → stackOffset → Local ty
-      localReg   : {ty : Type k} → register    → Local ty
+    data Local : Type d → Set where
+      localStack : {ty : Type d} → stackOffset → Local ty
+      localReg   : {ty : Type d} → register    → Local ty
 
 open DataStore public
 
 
 -- Operand Typeclass
 
-record Operand {d : Dim}{k : Kind {d} ✓}(A : Set) : Set where
+record Operand {d : Dim}(A : Set) : Set where
   field
     access? : Access
-    typeOf? : Type k
+    typeOf? : Type d
 
 open Operand
 
@@ -70,7 +70,7 @@ open Operand
 -- Operand instances
 
 private
-  module OperandInstances {arch : Arch}{acc : Access}{d : Dim}{k : Kind {d} ✓}{ty : Type k} where
+  module OperandInstances {arch : Arch}{acc : Access}{d : Dim}{ty : Type d} where
 
     instance
       paramIsOperand : Operand (Parameter arch acc ty)

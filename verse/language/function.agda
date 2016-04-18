@@ -27,14 +27,14 @@ lst ◾ = lst ▸ []
 private
   Typeⁿ : ℕ → Set
   Typeⁿ zero        = ⊤
-  Typeⁿ (suc zero)    = {d : Dim}{k : Kind {d} ✓} → Type k
-  Typeⁿ (suc (suc n)) = ({d : Dim}{k : Kind {d} ✓} → Type k) × Typeⁿ (suc n)
+  Typeⁿ (suc zero)    = {d : Dim} → Type d
+  Typeⁿ (suc (suc n)) = ({d : Dim} → Type d) × Typeⁿ (suc n)
 
 
 -- Data type that captures a single argument declaration.
 data ArgVarDecl : Set where
-  rw : {d : Dim}{k : Kind {d} ✓} → Type k → ArgVarDecl
-  ro : {d : Dim}{k : Kind {d} ✓} → Type k → ArgVarDecl
+  rw : {d : Dim} → Type d → ArgVarDecl
+  ro : {d : Dim} → Type d → ArgVarDecl
 
 
 -- Data type that captures a series of argument declarations of a function.
@@ -58,8 +58,8 @@ data LocalType : Set where
 
 -- Data type that captures local variable declaration
 data LocalVarDecl : Set where
-  rw : LocalType → {d : Dim}{k : Kind {d} ✓} → Type k → LocalVarDecl
-  ro : LocalType → {d : Dim}{k : Kind {d} ✓} → Type k → LocalVarDecl
+  rw : LocalType → {d : Dim} → Type d → LocalVarDecl
+  ro : LocalType → {d : Dim} → Type d → LocalVarDecl
 
 
 -- Data type that captures a series of local declarations in a function.
