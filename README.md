@@ -1,3 +1,9 @@
+NOTE
+----
+
+This project has been abandoned as of now. We now have a morally
+equivalent project in Coq. See https://github.com/raaz-crypto/verse-coq
+
 Verse
 -----
 
