@@ -23,4 +23,4 @@ record Machine (arch : Arch) : Set where
 
     -- Check whether this type is supported and raise an error
     -- otherwise.
-    type?        : {d : Dim} → {k : Kind {d} ✓} → Type k → Error (UserError arch)
+    type?        : {d : Dim} → Type d → Error (UserError arch)

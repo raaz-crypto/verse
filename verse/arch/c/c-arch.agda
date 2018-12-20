@@ -47,7 +47,7 @@ private
     CInstruction? : CInstruction → Error (UserError c-arch)
     CInstruction? _ = ✓
 
-    CType? : {d : Dim} → {k : Kind {d} ✓} → Type k → Error (UserError c-arch)
+    CType? : {d : Dim} → Type d → Error (UserError c-arch)
     CType? (word n en) with n ≤?ℕ 3
     ...                |    yes _ = ✓
     ...                |    no  _ = error: (Type word n en Unsupported)

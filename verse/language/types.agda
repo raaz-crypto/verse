@@ -18,59 +18,39 @@ data Dim : Set where
   ∞      : Dim
   finite : ℕ → Dim
 
-
--- Type that catches kind errors.
-data KindError : Set where
-  bound_≱_∎    : {n   : ℕ} → ℕⁿ {suc n} → ℕⁿ {suc n} → KindError
-
-
--- Checking for kind error.
-private
-  kind? : {n : ℕ} → ℕⁿ {n} → Error KindError
-  kind? {0}         _ = ✓
-  kind? {suc n } bˢ = unless 2 ˢ ≤? bˢ raise bound bˢ ≱ 2 ˢ ∎
-
-
--- The kind of a type.
-data Kind : {dim : Dim} → Error KindError → Set where
-     ⟨_⟩  : {n : ℕ}
-          → (bs : ℕⁿ {n})
-          → Kind {finite n} (kind? bs)
-
-     ⟨∞⟩  : Kind {∞} ✓                      -- Infinitary
-
-
 -- Scalars are kinds.
-⟨scalar⟩ : Kind {finite 0} ✓
-⟨scalar⟩ = ⟨_⟩ {0} scalar
+⟨scalar⟩ : Dim
+⟨scalar⟩ = finite 0
+⟨vector⟩ : Dim
+⟨vector⟩ = finite 1
 
 
 -- Types using dimensions and kinds
-data Type  :  {d : Dim} → Kind {d}  ✓ → Set where
+data Type  :  (d : Dim) → Set where
      word              : (n : ℕ)   -- 2^n bytes.
+                       → endian
                        → Type ⟨scalar⟩
 
-     array_of_endian_  : {n : ℕ}
-                       → (k : Kind {finite (suc n)} ✓)
+     array_of_endian_  : (n : ℕ)
                        → Type ⟨scalar⟩
                        → endian
-                       → Type k
+                       → Type ⟨vector⟩
 
-     _*                : {n : ℕ} {k : Kind {finite n} ✓}
-                       → Type k
-                       → Type ⟨∞⟩
+     _*                : {n : ℕ} 
+                       → Type (finite n)
+                       → Type ∞
 
 
 ------------------- Type short hands ---------------------------
 
 -- The byte type
-Byte   : Type ⟨scalar⟩; Byte   = word 0
+-- Byte   : Type ⟨scalar⟩; Byte   = word 0
 
 
 -- Word types in Haskell types.
-Word16 : Type ⟨scalar⟩; Word16 = word 1
-Word32 : Type ⟨scalar⟩; Word32 = word 2
-Word64 : Type ⟨scalar⟩; Word64 = word 3
+-- Word16 : Type ⟨scalar⟩; Word16 = word 1
+-- Word32 : Type ⟨scalar⟩; Word32 = word 2
+-- Word64 : Type ⟨scalar⟩; Word64 = word 3
 
 ----------------------------------------------------------------
 {-
